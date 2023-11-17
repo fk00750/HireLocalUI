@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { API } from "../api";
 
 function SignUp() {
   const [formData, setFormData] = useState({
@@ -7,8 +8,8 @@ function SignUp() {
     email: "",
     mobile: "",
     password: "",
+    role: "hirer", // Default role
   });
-
   const [errors, setErrors] = useState({
     name: "",
     email: "",
@@ -31,7 +32,7 @@ function SignUp() {
         return;
       }
 
-      const response = await fetch("http://localhost:4000/api/register", {
+      const response = await fetch(`${API}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,7 +41,6 @@ function SignUp() {
       });
 
       if (response.ok) {
-
         console.log("User registered successfully!");
 
         setFormData({
@@ -137,7 +137,6 @@ function SignUp() {
             >
               Email
             </label>
-            {/* {/* Pattern attribute value [a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)* is not a valid regular expression: Uncaught SyntaxError: Invalid regular expression: /[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?) v: Invalid character in character class signup:1 */}
             <input
               type="email"
               id="email"
@@ -200,6 +199,40 @@ function SignUp() {
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">{errors.password}</p>
             )}
+          </div>
+
+          {/* Role */}
+          <div className="mb-4">
+            <label
+              htmlFor="role"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Who Are You?
+            </label>
+            <div className="mt-1">
+              <input
+                type="radio"
+                id="hirer"
+                name="role"
+                value="hirer"
+                checked={formData.role === "hirer"}
+                onChange={handleChange}
+                className="mr-2"
+              />
+              <label htmlFor="hirer" className="mr-4">
+                Hirer
+              </label>
+              <input
+                type="radio"
+                id="worker"
+                name="role"
+                value="worker"
+                checked={formData.role === "worker"}
+                onChange={handleChange}
+                className="mr-2"
+              />
+              <label htmlFor="worker">Worker</label>
+            </div>
           </div>
 
           {/* Sign Up Button */}

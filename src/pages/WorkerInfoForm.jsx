@@ -1,15 +1,38 @@
-You are expert react developer with hands-on experience in tailwindcss, your task is to asssit me in creating a web application with the use of react and tailwindcss, step-by-step:
+import React from "react";
+import { useForm, Controller } from "react-hook-form";
+import { useAuth } from "../state/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-- Now Implement worker complete info api implementation.
-- API: localhost:4000/api/complete-worker-profile
-
-```
 const WorkerInfoForm = () => {
   const { control, handleSubmit } = useForm();
+  const { state } = useAuth();
+  const navigate = useNavigate()
 
-  const onSubmit = (data) => {
-    // Handle form submission logic here
-    console.log(data);
+
+  const onSubmit = async (data) => {
+    try {
+      // Make API call to complete-worker-profile
+      const response = await fetch('http://localhost:4000/api/complete-worker-profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${state.token}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        console.log('Worker info submitted successfully!');
+        navigate('/worker-profile')
+        // Handle success, e.g., redirect or show a success message
+      } else {
+        console.error('Failed to submit worker info:', response.statusText);
+        // Handle error, e.g., show an error message
+      }
+    } catch (error) {
+      console.error('Error during API call:', error.message);
+      // Handle error, e.g., show an error message
+    }
   };
 
   return (
@@ -150,4 +173,5 @@ const WorkerInfoForm = () => {
     </form>
   );
 };
-```
+
+export default WorkerInfoForm;

@@ -5,6 +5,8 @@ import HeroSection from "./components/HeroSection";
 import SignInPage from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
+import WorkerInfoForm from "./pages/WorkerInfoForm";
+import WorkerProfile from "./pages/WorkerProfile";
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/worker-info-form" element={<WorkerInfoForm />} />
+        <Route path="/worker-profile" element={<WorkerProfile />} />
       </Routes>
     </BrowserRouter>
   );

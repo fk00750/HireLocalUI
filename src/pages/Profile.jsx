@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaUser, FaEnvelope, FaMobile } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../state/AuthContext';
+import { API } from '../api';
 
 function Profile() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ function Profile() {
 
     const fetchUserProfile = async () => {
       try {
-        const response = await fetch('http://localhost:4000/api/user-profile', {
+        const response = await fetch(`${API}/user-profile`, {
           headers: {
             Authorization: `Bearer ${state.token}`,
           },

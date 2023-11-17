@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../state/AuthContext";
+import { API } from "../api";
 
 function SignIn() {
   const [formData, setFormData] = useState({
@@ -25,7 +26,7 @@ function SignIn() {
     }
 
     try {
-      const response = await fetch("http://localhost:4000/api/login", {
+      const response = await fetch(`${API}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,7 +41,11 @@ function SignIn() {
           dispatch({ type: "LOGIN", payload: { token: data.token } });
         }
 
-        navigate("/profile");
+        if (data.role === 2) {
+          navigate("/profile");
+        } else if (data.role === 3) {
+          navigate("/worker-info-form");
+        }
       } else {
         console.error("User login failed");
       }
