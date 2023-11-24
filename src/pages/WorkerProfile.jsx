@@ -1,74 +1,78 @@
-import React, { useState } from "react";
-import { FaEnvelope, FaMobile, FaUser } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { API } from "../api";
 import { useAuth } from "../state/AuthContext";
+import { Link } from "react-router-dom";
 
-function WorkerProfile() {
+const WorkerProfile = () => {
   const [workerData, setWorkerData] = useState(null);
-  const [additonalWorkerData, setAdditionalWorkerData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
   const { state } = useAuth();
-  const navigate = useNavigate();
 
+  const [error, setError] = useState(false);
 
+  useEffect(() => {
+    // Fetch worker data from the API
+    const fetchWorkerData = async () => {
+      try {
+        const response = await fetch(`${API}/get-worker`, {
+          headers: {
+            Authorization: `Bearer ${state.token}`,
+          },
+        });
 
-  if (!state.isAuthenticated || loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-white p-8 rounded shadow-md w-full md:w-96">
-          {loading ? (
-            <p className="text-xl font-bold mb-4">Loading...</p>
-          ) : (
-            <p className="text-xl text-red-500 font-bold mb-4">
-              Please Sign In to view your profile.
-            </p>
-          )}
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-            onClick={() => navigate("/signin")}
-          >
-            Sign In
-          </button>
-        </div>
-      </div>
-    );
+        if (response.status === 404) {
+          setError(true); // Set error state to true on 404 response
+          setWorkerData(true);
+        }
+
+        if (response.ok) {
+          const data = await response.json();
+          setWorkerData(data);
+        } else {
+          console.error("Failed to fetch worker data:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error during worker data fetch:", error.message);
+      }
+    };
+
+    fetchWorkerData();
+  }, [state.token]); // Include state.token in the dependency array to avoid eslint warning
+
+  if (!workerData) {
+    // You can render a loading state while waiting for the data
+    return <div>Loading...</div>;
   }
+
+  // Having error in the following code block
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="bg-white p-8 rounded shadow-md w-full md:w-96">
-        <h2 className="text-2xl font-bold mb-4">Worker Profile</h2>
-        <div className="mb-4 flex items-center">
-          <FaUser className="text-gray-600 mr-2" />
-          <label className="block text-sm font-medium text-gray-700">
-            Name
-          </label>
-          <p className="mt-1 p-2 w-full border rounded-md">
-            {workerData?.name}
-          </p>
+      {error ? (
+        <div className="bg-red-200 p-4 rounded-md">
+          <Link to="/worker-info-form">
+            <button>Please Complete Your Details</button>
+          </Link>
         </div>
-        <div className="mb-4 flex items-center">
-          <FaEnvelope className="text-gray-600 mr-2" />
-          <label className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <p className="mt-1 p-2 w-full border rounded-md">
-            {workerData?.email}
-          </p>
+      ) : (
+        <div className="bg-white p-8 rounded shadow-md w-full md:w-96">
+          <h2 className="text-2xl font-bold mb-4 text-center text-blue-500">
+            Worker Profile
+          </h2>
+
+          {Object.entries(workerData).map(([key, value]) => (
+            <div key={key} className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 capitalize">
+                {key}
+              </label>
+              <p className="mt-1 p-2 w-full border rounded-md bg-gray-100">
+                {value}
+              </p>
+            </div>
+          ))}
         </div>
-        <div className="mb-4 flex items-center">
-          <FaMobile className="text-gray-600 mr-2" />
-          <label className="block text-sm font-medium text-gray-700">
-            Mobile
-          </label>
-          <p className="mt-1 p-2 w-full border rounded-md">
-            {workerData?.mobile}
-          </p>
-        </div>
-      </div>
+      )}
     </div>
   );
-}
+};
 
 export default WorkerProfile;

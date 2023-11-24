@@ -38,13 +38,16 @@ function SignIn() {
         const data = await response.json();
 
         if (data.success && data.token) {
-          dispatch({ type: "LOGIN", payload: { token: data.token } });
+          dispatch({
+            type: "LOGIN",
+            payload: { token: data.token, role: data.role },
+          });
         }
 
         if (data.role === 2) {
           navigate("/profile");
         } else if (data.role === 3) {
-          navigate("/worker-info-form");
+          navigate("/worker-profile");
         }
       } else {
         console.error("User login failed");

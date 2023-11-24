@@ -1,153 +1,166 @@
 You are expert react developer with hands-on experience in tailwindcss, your task is to asssit me in creating a web application with the use of react and tailwindcss, step-by-step:
 
-- Now Implement worker complete info api implementation.
-- API: localhost:4000/api/complete-worker-profile
+- The error message should disappear after some time:
+
 
 ```
-const WorkerInfoForm = () => {
-  const { control, handleSubmit } = useForm();
+function JobForm() {
+  const [submissionError, setSubmissionError] = useState(null);
+  const { state } = useAuth();
+  const [formData, setFormData] = useState({
+    jobTitle: "",
+    jobDescription: "",
+    jobType: "",
+    numWorkers: "",
+    location: "",
+  });
 
-  const onSubmit = (data) => {
-    // Handle form submission logic here
-    console.log(data);
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      // Handle form submission here
+      console.log(formData);
+
+      const response = await fetch(`${API}/post-job`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${state.token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) setFormData(formData);
+      else {
+        const errorData = await response.json();
+        setSubmissionError(errorData.message || "Failed to Search for Workers");
+      }
+    } catch (error) {
+      console.error("Error during job post:", error.message);
+      setSubmissionError("Failed to Search Worker");
+    }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="max-w-md mx-auto bg-white p-4 md:p-6 rounded-md shadow-md"
-    >
-      {/* Work Type Input */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">
-          Work Type
-        </label>
-        <Controller
-          name="workType"
-          control={control}
-          defaultValue="hourly"
-          rules={{ required: true }}
-          render={({ field }) => (
+    <div className="container mx-auto p-4">
+      <div className="max-w-md mx-auto bg-white rounded p-6 shadow-md">
+        <h2 className="text-2xl font-semibold mb-6 text-black">
+          Job Posting Form
+        </h2>
+
+        {/* Job Title Input */}
+        <div className="mb-6 relative">
+          <BiUser className="w-6 h-6 text-gray-500 absolute top-1/2 transform -translate-y-1/2 left-3" />
+          <input
+            type="text"
+            id="jobTitle"
+            name="jobTitle"
+            value={formData.jobTitle}
+            onChange={handleChange}
+            className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-md focus:outline-none focus:border-blue-500 placeholder-gray-500"
+            placeholder="Job Title"
+          />
+        </div>
+
+        {/* Job Description Input */}
+        <div className="mb-6 relative">
+          <BiBriefcase className="w-6 h-6 text-gray-500 absolute top-2 left-2" />
+          <textarea
+            id="jobDescription"
+            name="jobDescription"
+            rows="4"
+            value={formData.jobDescription}
+            onChange={handleChange}
+            className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-md focus:outline-none focus:border-blue-500 placeholder-gray-500"
+            placeholder="Job Description"
+          ></textarea>
+        </div>
+
+        {/* Job Type, Number of Workers, and Location Select */}
+        <div className="grid grid-cols-2 gap-4">
+          {/* Job Type Select */}
+          <div className="relative">
+            <BiBriefcase className="w-6 h-6 text-gray-500 absolute top-1/2 transform -translate-y-1/2 left-3" />
             <select
-              {...field}
-              className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-blue-500 text-gray-800"
+              id="jobType"
+              name="jobType"
+              value={formData.jobType}
+              onChange={handleChange}
+              className="w-full pl-10 appearance-none px-4 py-2 border border-gray-300 text-black rounded-md focus:outline-none focus:border-blue-500"
+              required
             >
-              <option value="hourly">Hourly</option>
-              {/* Add more work types as needed */}
+              <option value="" disabled selected>
+                Job Type
+              </option>
+              <option value="fullTime">Full Time</option>
+              <option value="partTime">Part Time</option>
+              <option value="contract">Contract</option>
             </select>
-          )}
-        />
-      </div>
+          </div>
 
-      {/* Age Input */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Age</label>
-        <Controller
-          name="age"
-          control={control}
-          defaultValue=""
-          rules={{ required: true, pattern: /^\d+$/ }}
-          render={({ field }) => (
+          {/* Number of Workers Select */}
+          <div className="relative">
+            <BiUser className="w-6 h-6 text-gray-500 absolute top-1/2 transform -translate-y-1/2 left-3" />
+            <select
+              id="numWorkers"
+              name="numWorkers"
+              value={formData.numWorkers}
+              onChange={handleChange}
+              className="w-full pl-10 appearance-none px-4 py-2 border border-gray-300 text-black rounded-md focus:outline-none focus:border-blue-500"
+              required
+            >
+              <option value="" disabled selected>
+                Workers
+              </option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="more">More than 3</option>
+            </select>
+          </div>
+
+          {/* Location Input */}
+          <div className="relative col-span-2">
+            <BiMap className="w-6 h-6 text-gray-500 absolute top-1/2 transform -translate-y-1/2 left-3" />
             <input
-              {...field}
               type="text"
-              className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-blue-500 text-gray-800"
-              placeholder="Enter age"
+              id="location"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-md focus:outline-none focus:border-blue-500 placeholder-gray-500"
+              placeholder="Location"
+              required
             />
-          )}
-        />
-      </div>
+          </div>
 
-      {/* Location Input */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">
-          Location
-        </label>
-        <Controller
-          name="location"
-          control={control}
-          defaultValue=""
-          rules={{ required: true }}
-          render={({ field }) => (
-            <input
-              {...field}
-              type="text"
-              className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-blue-500 text-gray-800"
-              placeholder="Enter location"
-            />
-          )}
-        />
-      </div>
+          {/* Button */}
+          <div className="col-span-2">
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300"
+            >
+              Submit
+            </button>
+          </div>
+        </div>
 
-      {/* Specialty Input */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">
-          Specialty
-        </label>
-        <Controller
-          name="specialty"
-          control={control}
-          defaultValue=""
-          rules={{ required: true }}
-          render={({ field }) => (
-            <input
-              {...field}
-              type="text"
-              className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-blue-500 text-gray-800"
-              placeholder="Enter specialty"
-            />
-          )}
-        />
-      </div>
+        {submissionError && (
+          <div className="mt-4 text-red-500">
+            <p>{submissionError}</p>
+          </div>
+        )}
 
-      {/* Experience Input */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">
-          Experience
-        </label>
-        <Controller
-          name="experience"
-          control={control}
-          defaultValue=""
-          rules={{ required: true, pattern: /^\d+$/ }}
-          render={({ field }) => (
-            <input
-              {...field}
-              type="text"
-              className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-blue-500 text-gray-800"
-              placeholder="Enter experience"
-            />
-          )}
-        />
+        {/* Other form fields will go here */}
       </div>
-
-      {/* Wage Input */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Wage</label>
-        <Controller
-          name="wage"
-          control={control}
-          defaultValue=""
-          rules={{ required: true, pattern: /^\d+$/ }}
-          render={({ field }) => (
-            <input
-              {...field}
-              type="text"
-              className="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-blue-500 text-gray-800"
-              placeholder="Enter wage"
-            />
-          )}
-        />
-      </div>
-
-      {/* Submit Button */}
-      <button
-        type="submit"
-        className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue"
-      >
-        Submit
-      </button>
-    </form>
+    </div>
   );
-};
-```
+}
+``` 

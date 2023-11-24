@@ -2,6 +2,7 @@ import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useAuth } from "../state/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { API } from "../api";
 
 const WorkerInfoForm = () => {
   const { control, handleSubmit } = useForm();
@@ -12,7 +13,7 @@ const WorkerInfoForm = () => {
   const onSubmit = async (data) => {
     try {
       // Make API call to complete-worker-profile
-      const response = await fetch('http://localhost:4000/api/complete-worker-profile', {
+      const response = await fetch(`${API}/complete-worker-profile`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
